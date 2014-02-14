@@ -34,7 +34,7 @@ module.exports = function(grunt) {
   // Please see the grunt documentation for more information regarding task
   // creation: https://github.com/gruntjs/grunt/blob/devel/docs/toc.md
 
-  var _ = grunt.utils._;
+  var _ = grunt.util._;
 
   grunt.registerMultiTask('pgcreateuser', 'Add a new Postgres user.', function() {
       var self = this;
@@ -43,8 +43,16 @@ module.exports = function(grunt) {
 
       var stmt = 'CREATE user ' + data.user;
 
+      if (data.roles) {
+        stmt += ' ' + data.roles.join(', ');
+      }
+
+      if (data.password) {
+        stmt += ' PASSWORD \'' + data.password + '\'';
+      }
+
       execute_db(data.connection, stmt, function(err, res) {
-          grunt.log.writeln("Database user '" + data.user + "' created.");
+          grunt.log.writeln("Database user '" + data.user + "' created" + (data.roles ? ' with roles: ' + data.roles.join(', ') : '') + '.');
           done();
       });
   });
